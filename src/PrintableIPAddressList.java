@@ -1,0 +1,42 @@
+import java.io.IOException;
+import java.net.InetAddress;
+
+// Class IPAddressList remains unchanged 
+
+class PrintableIPAddressList {
+
+	private final IPAddressList ips;
+	
+	public PrintableIPAddressList(IPAddressList list) { 
+		this.ips = list;
+	}
+	
+	public synchronized void addIPAddress(InetAddress address) { 
+		ips.addIPAddress(address);
+	}
+	
+	public synchronized void addAndPrintIPAddresses(InetAddress address) { 
+		addIPAddress(address);
+		InetAddress[] ia = (InetAddress[]) ips.getList().toArray(new InetAddress[0]); 
+		// ...
+	}
+	
+	public void testCase(final InetAddress address){
+		Thread test = new Thread(new Runnable() {
+			public void run() {
+				PrintableIPAddressList testP = new PrintableIPAddressList(ips);
+				testP.addAndPrintIPAddresses(address);
+				}
+			});
+			   test.start();
+	}
+	
+	public void main(String[] args) throws IOException { 
+		
+		InetAddress addr1 = InetAddress.getByName("127.0.0.1");	
+		InetAddress addr2 = InetAddress.getByName("10.190.112.3");		
+
+		testCase(addr1); // starts thread 1 
+		testCase(addr2); // starts thread 2
+	}
+}
